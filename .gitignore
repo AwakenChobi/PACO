@@ -6,6 +6,9 @@ __pycache__/
 # C extensions
 *.so
 
+#Some testing files
+test_save_peaks.py
+
 # Distribution / packaging
 .Python
 build/
