@@ -1,11 +1,7 @@
 import numpy as np
-import tkinter as tk
 
 # Function to compute the average and standard deviation of three datasets with offsets
 def compute_stats(datasets, offsets, ax, canvas):
-    #if len(datasets) != 3:
-    #    tk.messagebox.showerror("Error", "You need exactly 3 datasets to compute statistics.")
-    #    return
 
     # Adjust x values with offsets
     adjusted_data = [

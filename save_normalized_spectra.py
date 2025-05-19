@@ -23,8 +23,8 @@ def save_normalized_spectra(datasets, offsets):
     # xp: The x-coordinates of the data points. These are the x values of the datasets.
     # fp: The y-coordinates of the data points. These are the y values of the datasets.
     interpolated_y = [
-        np.interp(common_x, [xi + offsets[i] for xi in x], y)
-        for i, (x, y) in enumerate(adjusted_data)
+        np.interp(common_x, x, y)
+        for x, y in adjusted_data
     ]
     avg_y = np.mean(interpolated_y, axis=0)
 

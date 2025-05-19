@@ -1,9 +1,6 @@
 # This script creates a scatter plot using Matplotlib and allows the user to adjust the x-axis offset using a slider in a Tkinter GUI.
 # Import necessary libraries
 from tkinter import filedialog
-from compute_stats import compute_stats
-from save_normalized_spectra import save_normalized_spectra
-from read_xy_file import read_xy_file
 from plot_with_offset import plot_with_offset
 import tkinter as tk
 import numpy as np
@@ -30,9 +27,6 @@ try:
 except Exception as e:
     tk.messagebox.showerror("Error", f"Failed to load files: {e}")
     exit()
-
-# store the data in a variable
-#x, y = read_xy_file(file_path)
 
 # Initialize the Tkinter window
 plot_with_offset(datasets)

@@ -51,7 +51,7 @@ def save_normalized_peaks(common_x, normalized_avg_y, std_dev_y):
     if not file_path:
         return  # User canceled the save dialog
 
-    peak_indices = [i for i, x in enumerate(common_x) if i in peaks]
+    peak_indices = [i for i, _ in enumerate(common_x) if i in peaks]
     data_to_save = np.column_stack((
         common_x[peak_indices],
         normalized_avg_y[peak_indices],

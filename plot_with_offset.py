@@ -1,5 +1,5 @@
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
-from tkinter import ttk, filedialog
+from tkinter import ttk
 from compute_stats import compute_stats
 from save_normalized_spectra import save_normalized_spectra
 from normalize_spectra import normalize_spectra
@@ -7,9 +7,7 @@ from saturated_lines_searcher import saturated_lines_searcher
 from scipy.signal import find_peaks
 from save_peaks import save_normalized_peaks
 import tkinter as tk
-import matplotlib.ticker as ticker
 import tkinter.simpledialog as simpledialog
-import numpy as np
 import matplotlib.pyplot as plt
 
 def plot_with_offset(datasets):
@@ -71,6 +69,9 @@ def plot_with_offset(datasets):
         "C2 head bands": "olive",
     }
 
+    #Automatically store the normalized spectra for further calculations
+    [common_x, normalized_avg_y, std_dev_y]=normalize_spectra(datasets, offsets)
+
     # Create a Matplotlib figure
     # Create a figure and axis for the plot
     # Set the size of the figure
@@ -113,7 +114,7 @@ def plot_with_offset(datasets):
         if show_saturated_lines[0]:
             # Get all saturated x positions from all datasets
             for i, (x, y) in enumerate(datasets):
-                saturated_x = saturated_lines_searcher(x, y)
+                saturated_x = saturated_lines_searcher(x+offsets[i], y)
                 for sx in saturated_x:
                     line = ax.axvline(sx, color='red', linestyle='--', linewidth=1.5)
                     saturated_lines_artists.append(line)
@@ -163,10 +164,14 @@ def plot_with_offset(datasets):
     else:
         selected_dataset.set("Select Dataset")  # Default if no datasets are available
 
+    dataset_options = [f"Dataset {i+1}" for i in range(len(datasets))]
+    selected_dataset = tk.StringVar(value=dataset_options[0] if dataset_options else "Select Dataset")
+
     dataset_dropdown = ttk.OptionMenu(
         control_frame,
         selected_dataset,
-        *[f"Dataset {i+1}" for i in range(len(datasets))]
+        dataset_options[0] if dataset_options else "Select Dataset",
+        *dataset_options
     )
     dataset_dropdown.pack(side=tk.LEFT, padx=5)
 
@@ -198,10 +203,7 @@ def plot_with_offset(datasets):
     
     ttk.Button(control_frame, text="Apply Offset", command=apply_offset).pack()
 
-    #Automatically store the normalized spectra for further calculations
-    [common_x, normalized_avg_y, std_dev_y]=normalize_spectra(datasets, offsets)
-
-        # State variable for plot mode: 0 = datasets, 1 = normalized
+    # State variable for plot mode: 0 = datasets, 1 = normalized
     plot_mode = [0]  # Use a list for mutability in nested functions
 
     def update_plot_mode():
@@ -214,6 +216,8 @@ def plot_with_offset(datasets):
             ax.set_title("Plot with Offset Adjustment")
         else:
             # Plot normalized averaged spectrum
+            nonlocal common_x, normalized_avg_y, std_dev_y
+            [common_x, normalized_avg_y, std_dev_y]=normalize_spectra(datasets, offsets)
             ax.plot(common_x, normalized_avg_y, label="Normalized Averaged Spectrum", color="black")
             ax.set_title("Normalized Averaged Spectrum")
         ax.set_xlabel("X Axis")
@@ -311,7 +315,11 @@ def plot_with_offset(datasets):
         show_ref_lines[0] = not show_ref_lines[0]
         # Remove old lines
         for artist in ref_lines_artists:
-            artist.remove()
+            if hasattr(artist, "remove"):
+                try:
+                    artist.remove()
+                except NotImplementedError:
+                    pass  # Ignore artists that cannot be removed
         ref_lines_artists.clear()
         if show_ref_lines[0]:
             ref_name = selected_ref_lines.get()
