@@ -81,8 +81,8 @@ To get a local copy up and running follow these simple steps.
 
 1. Clone the repo
    ```sh
-   git clone https://github.com/github_username/repo_name.git
-   cd repo_name
+   git clone https://github.com/AwakenChobi/PACO.git
+   cd PACO
    ```
 2. (Optional) Create a virtual environment
    ```sh
@@ -99,12 +99,12 @@ To get a local copy up and running follow these simple steps.
 The main scripts and their purposes are:
 
 - `main.py`: Entry point for batch processing and orchestration.
-- `read_xy_file.py`: Reads spectral data from XY files.
+- `read_xy_file.py`: Reads spectral data from XY files (being X the frecuency/waveleght and Y the intensity).
 - `normalize_spectra.py`: Normalizes spectra for comparison.
-- `plot_with_offset.py`: Plots multiple spectra with vertical offsets.
-- `saturated_lines_searcher.py`: Detects saturated lines in spectra.
-- `save_normalized_spectra.py`: Saves normalized spectra to files.
-- `save_peaks.py`: Saves detected peaks to files.
+- `plot_with_offset.py`: Plots multiple datasets (ideally of the same experimental condition) and applies the inputed offset. Some reference wavelenghts are included in the code, but the user can easily add more if they are needed. This function also plots the averaged-normalized spectra. It also have the functionality to detect and mark peaks in the former plot given a minimum intensity for a peak to be considered as one.
+- `saturated_lines_searcher.py`: Detects saturated lines in spectra. The saturation limit can be easily modified inside the code.
+- `save_normalized_spectra.py`: Saves normalized spectra in a .txt file.
+- `save_peaks.py`: Saves detected peaks to a .txt file. The minimum intensity is first asked.
 - `compute_stats.py`: Computes statistics on spectral data.
 
 Example usage:
@@ -175,6 +175,7 @@ Project Link: [https://github.com/github_username/repo_name](https://github.com/
 
 * [numpy](https://numpy.org/)
 * [matplotlib](https://matplotlib.org/)
+* [Laboratorio de Innovación en Plasmas]
 
 <!-- MARKDOWN LINKS & IMAGES -->
 [contributors-shield]: https://img.shields.io/github/contributors/github_username/repo_name.svg?style=for-the-badge
