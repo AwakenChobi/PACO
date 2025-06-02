@@ -2,9 +2,9 @@ import numpy as np
 
 def normalize_spectra(datasets, offsets):
 
-    # Adjust x values with offsets
+    # Adjust x values with offsets and y values by subtracting the minimum y value (considering it as the background)
     adjusted_data = [
-        ([xi + offsets[i] for xi in x], y) for i, (x, y) in enumerate(datasets)
+        ([xi + offsets[i] for xi in x], yi - min(y) for yi in y) for i, (x, y) in enumerate(datasets)
     ]
 
     # Calculate the overlapping range

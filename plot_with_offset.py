@@ -69,7 +69,7 @@ def plot_with_offset(datasets):
         "C2 head bands": "olive",
     }
 
-    #Automatically store the normalized spectra for further calculations
+    #Automatically store the normalized spectra (and substracted) for further calculations
     [common_x, normalized_avg_y, std_dev_y]=normalize_spectra(datasets, offsets)
 
     # Create a Matplotlib figure
