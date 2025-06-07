@@ -19,4 +19,6 @@ def read_xy_file(file_path):
         print(f"Error: The file '{file_path}' was not found.")
     except ValueError:
         print("Error: Ensure the file contains two numeric columns separated by spaces.")
+    
+    print("Data read successfully from the file.")
     return x_data, y_data

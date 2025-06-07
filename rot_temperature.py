@@ -1,26 +1,100 @@
 import numpy as np
-from scipy.signal import find_peaks
+from scipy.stats import linregress
 
 def rot_temperature_C2(x, y):
-    height = 
-    wavelength_subpeaks = { "P22" : 516.52, "P23" : 516.30, "P24" : 516.26, "P25" : 516.20, "P26" : 516.12, "P27" : 516.02, 
-                            "P28" : 515.96, "P29" : 515.86, "P30" : 515.77, "P31" : 515.67, "P32" : 515.56, "P33" : 515.45,
-                            "P34" : 515.32, "P35" : 515.19, "P36" : 515.06, "P37" : 514.92, "P38" : 514.78, "P39" : 514.62, 
-                            "P40" : 514.47, "P41" : 514.30, "P42" : 514.12, "P43" : 513.94, "P44" : 513.77, "P45" : 513.56, 
-                            "P46" : 513.37, "P47" : 513.16}
-    tolerance = 0.04
-    find_peaks(y, height)
+    x = np.array(x)
+    y = np.array(y)
+    peaks=[]
+    wavelength_subpeaks = { "P25" : 516.22, "P26" : 516.12, "P27" : 516.02, "P28" : 515.90,
+                            "P29" : 515.79, "P30" : 515.77, "P31" : 515.67, "P32" : 515.56,
+                            "P33" : 515.45, "P34" : 515.32, "P35" : 515.19, "P36" : 515.06,
+                            "P37" : 514.92, "P38" : 514.78, "P39" : 514.62, "P40" : 514.47,
+                            "P41" : 514.30, "P42" : 514.12, "P43" : 513.94, "P44" : 513.77,
+                            "P45" : 513.56
+                            }
+    crosssection_subpeaks= {"P25" : 24.96, "P26" : 25.961538, "P27" : 26.962963, "P28" : 27.964286, "P29" : 28.965517, "P30" : 29.966667, 
+                            "P31" : 30.967742, "P32" : 31.96875, "P33" : 32.969697, "P34" : 33.970588, "P35" : 34.971429, "P36" : 35.972222,
+                            "P37" : 36.972222, "P38" : 37.973684, "P39" : 38.974359, "P40" : 39.975, "P41" : 40.97561, "P42" : 41.97619,
+                            "P43" : 42.976744, "P44" : 43.977273, "P45" : 44.977778}
 
-    return temperature, error
+    energy_subpeaks = [(i**2)-i for i in range(25, 45)]
+    
+    tolerance = 0.04
+    for key in [f"P{i}" for i in range(25, 45)]:
+        center = wavelength_subpeaks[key]
+        mask = (x >= center - tolerance) & (x <= center + tolerance)
+        if np.any(mask):
+            peaks.append(np.max(y[mask]))
+        else:
+            print(f"Warning: No x values found for {key} in interval [{center-tolerance}, {center+tolerance}]")  # or handle missing data as you prefer
+            peaks.append(np.nan)
+
+    log_i_A = [np.log(peaks[i]/crosssection_subpeaks[f"P{i+25}"]) for i in range(len(peaks))]
+
+    slope, intercept, r_value, p_value, std_err = linregress(energy_subpeaks, log_i_A)
+
+    #-1.09 is the factor used to convert the slope to temperature in Kelvin
+    temperature = -1.09 / slope  
+    error = (std_err * 1.09) / (slope * slope)  # Error of the slope 
+    return temperature, error, r_value, p_value, intercept
 
 def rot_temperature_OH(x, y):
+    x = np.array(x)
+    y = np.array(y)
+    peaks=[]
+    
+    wavelength_subpeaks = { "Q4" : 308.3, "Q5" : 308.5, "Q6" : 308.7, "Q8" : 309.2, "Q9" : 309.5, "Q10" : 309.8}
 
+    crosssection_subpeaks= {"Q4" : 3.37e16, "Q5" : 4.22e19, "Q6" : 5.06e19, "Q8" : 6.75e19, "Q9" : 7.58e19, "Q10" : 8.41e19}
 
+    energy_subpeaks = [32779, 32948, 33150, 33652, 33952, 34283]
+    
+    tolerance = 0.03
+    for key in [f"Q{i}" for i in range(4, 11)]:
+        center = wavelength_subpeaks[key]
+        mask = (x >= center - tolerance) & (x <= center + tolerance)
+        if np.any(mask):
+            peaks.append(np.max(y[mask]))
+        else:
+            print(f"Warning: No x values found for {key} in interval [{center-tolerance}, {center+tolerance}]")  # or handle missing data as you prefer
+            peaks.append(np.nan)
 
-    return temperature, error
+    log_i_A = [np.log(peaks[i]/crosssection_subpeaks[f"P{i+25}"]) for i in range(len(peaks))]
 
-def rot_temperature_CN(x, y):
+    slope, intercept, r_value, p_value, std_err = linregress(energy_subpeaks, log_i_A)
 
+    #-1.09 is the factor used to convert the slope to temperature in Kelvin
+    temperature = -0.625 / slope  
+    error = (std_err * 1.09) / (slope * slope)  # Error of the slope 
+    return temperature, error, r_value, p_value, intercept
 
+def rot_temperature_N2_plus(x, y):
+    x = np.array(x)
+    y = np.array(y)
+    
+    peaks=[]
 
-    return temperature, error
+    wavelength_subpeaks = { "L1" : 390.41, "L2" : 390.6, "L3" : 390.76, "L4" : 390.91, "L5" : 391.04, "L6" : 391.15, "L7" : 391.25}
+
+    crosssection_subpeaks= { "L1" : 68, "L2" : 64, "L3" : 60, "L4" : 56, "L5" : 52, "L6" : 48, "L7" : 44}
+
+    energy_subpeaks = [1122, 992, 870, 756, 650, 552, 462]
+    
+    tolerance = 0.04
+    for key in [f"P{i}" for i in range(25, 46)]:
+        center = wavelength_subpeaks[key]
+        mask = (x >= center - tolerance) & (x <= center + tolerance)
+        if np.any(mask):
+            peaks.append(np.max(y[mask]))
+        else:
+            print(f"Warning: No x values found for {key} in interval [{center-tolerance}, {center+tolerance}]")  # or handle missing data as you prefer
+            peaks.append(np.nan)
+
+    log_i_A = [np.log(peaks[i]/crosssection_subpeaks[f"P{i+25}"]) for i in range(len(peaks))]
+
+    slope, intercept, r_value, p_value, std_err = linregress(energy_subpeaks, log_i_A)
+
+    #-1.09 is the factor used to convert the slope to temperature in Kelvin
+    temperature = -1.296 / slope  
+    error = (std_err * 1.09) / (slope * slope)  # Error of the slope 
+    return temperature, error, r_value, p_value, intercept

@@ -6,6 +6,7 @@ from normalize_spectra import normalize_spectra
 from saturated_lines_searcher import saturated_lines_searcher
 from scipy.signal import find_peaks
 from save_peaks import save_normalized_peaks
+from rot_temperature import rot_temperature_C2, rot_temperature_OH, rot_temperature_N2_plus
 import tkinter as tk
 import tkinter.simpledialog as simpledialog
 import matplotlib.pyplot as plt
@@ -264,16 +265,66 @@ def plot_with_offset(datasets):
     button_frame.pack(side=tk.BOTTOM, fill=tk.X, pady=10)
     ttk.Button(button_frame, text="Compute Stats", command=lambda: compute_stats(datasets, offsets, ax, canvas)).pack(side=tk.RIGHT, padx=5)
     ttk.Button(button_frame, text="Save Normalized Spectra", command=lambda: save_normalized_spectra(datasets, offsets)).pack(side=tk.RIGHT, padx=5)
-    root = tk.Tk()
-    root.withdraw()  # Hide the main window
+    #root = tk.Tk()
+    #root.withdraw()  # Hide the main window
     ttk.Button(button_frame, text="Save Normalized Peaks", command=lambda: save_normalized_peaks(common_x, normalized_avg_y, std_dev_y)).pack(side=tk.RIGHT, padx=5)
     ttk.Button(button_frame, text="Toggle Plot Mode", command=toggle_plot_mode).pack(side=tk.LEFT, padx=5)
     ttk.Button(button_frame, text="Compute & Plot Peaks", command=plot_peaks_on_normalized).pack(side=tk.LEFT, padx=5)
 
-    ##############################################################
-    ##############################################################
-    ##############################################################
+    #Temperature computation
     temperature=0
+
+#    # Add dropdown for temperature computation method
+    temp_methods = ["C2 (averaged)", "N2+ (averaged)", "OH (averaged)", "C2 (1 by 1)", "N2+ (1 by 1)", "OH (1 by 1)"]
+    selected_temp_method = tk.StringVar()
+    selected_temp_method.set(temp_methods[0])
+    temp_method_dropdown = ttk.OptionMenu(control_frame, selected_temp_method, temp_methods[0], *temp_methods)
+    temp_method_dropdown.pack(side=tk.LEFT, padx=5)
+
+    # Function to compute and display temperature
+    def compute_temperature():
+        method = selected_temp_method.get()
+        if "averaged" in method:
+            if "C2" in method:
+                temperature, error, *_ = rot_temperature_C2(common_x, normalized_avg_y)
+            elif "N2+" in method:
+                temperature, error, *_ = rot_temperature_N2_plus(common_x, normalized_avg_y)
+            elif "OH" in method:
+                temperature, error, *_ = rot_temperature_OH(common_x, normalized_avg_y)
+            else:
+                temperature, error = None, None
+        elif "1 by 1" in method:
+            temps = []
+            errs = []
+            for i, (x, y) in enumerate(datasets):
+                x_offset = [xi + offsets[i] for xi in x]
+                if "C2" in method:
+                    t, e, *_ = rot_temperature_C2(x_offset, y)
+                elif "N2+" in method:
+                    t, e, *_ = rot_temperature_N2_plus(x_offset, y)
+                elif "OH" in method:
+                    t, e, *_ = rot_temperature_OH(x_offset, y)
+                else:
+                    t, e = None, None
+                if t is not None:
+                    temps.append(t)
+                    errs.append(e)
+            if temps:
+                temperature = np.mean(temps)
+                error = np.sqrt(np.sum(np.array(errs)**2)) / len(errs)  # combine errors
+            else:
+                temperature, error = None, None
+        else:
+            temperature, error = None, None
+
+        if temperature is not None:
+            temperature_label.config(text=f"Gas Temperature: {temperature:.1f} K ± {error:.1f} K")
+        else:
+            temperature_label.config(text="Temperature calculation failed.")
+
+    # Add button to compute temperature
+    ttk.Button(control_frame, text="Compute Temperature", command=compute_temperature).pack(side=tk.LEFT, padx=5)
+
 
     show_saturated_lines = [False]
     saturated_lines_artists = []
