@@ -1,5 +1,5 @@
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
-from tkinter import ttk
+from tkinter import ttk, messagebox
 from compute_stats import compute_stats
 from save_normalized_spectra import save_normalized_spectra
 from normalize_spectra import normalize_spectra
@@ -10,8 +10,38 @@ from rot_temperature import rot_temperature_C2, rot_temperature_OH, rot_temperat
 import tkinter as tk
 import tkinter.simpledialog as simpledialog
 import matplotlib.pyplot as plt
+import numpy as np
 
 def plot_with_offset(datasets):
+    
+    # Adjust background for each dataset
+    adjusted_datasets = []
+    for idx, (x, y) in enumerate(datasets):
+        x = np.array(x)
+        y = np.array(y)
+        mask = (x >= 104) & (x <= 105)
+        if np.any(mask):
+            background = np.mean(y[mask])
+        else:
+            background = 0  # or handle as you prefer
+
+        # If background is above 30, warn and allow manual input
+        if background > 30:
+            msg = (f"Dataset {idx+1}: The computed background value is {background:.2f}, "
+                "which is above 30.\nIt is possible that the background is not well computed.\n"
+                "Would you like to input the background value manually?")
+            if messagebox.askyesno("Background Warning", msg):
+                manual_bg = simpledialog.askfloat(
+                    "Manual Background Input",
+                    f"Enter background value for Dataset {idx+1}:",
+                    initialvalue=background
+                )
+                if manual_bg is not None:
+                    background = manual_bg
+
+        y_adjusted = y - background
+        adjusted_datasets.append((x, y_adjusted))
+    datasets = adjusted_datasets
 
     offsets = [0]*len(datasets) # Start with an initial offset of 0 for the first dataset
 
@@ -24,7 +54,7 @@ def plot_with_offset(datasets):
     #Atomic lines detected in Atm press Argon plasmas in TIAGO 
     # REF: NIST atomic spectra database:
     Ar_lines=[430.0, 560.6, 696.5, 706.72175,720.6980, 727.2936, 731.1716, 731.6005, 737.2118, 738.3980]
-    C_lines=[247.85612, 296.72240, 426.90197, 538.03308]
+    C_lines=[247.85612, 258.289728, 296.72240, 426.90197, 538.03308]
     N_lines=[740.612, 740.624, 742.364, 744.229, 821.6]
     H_lines=[486.1, 656.279]
     O_lines=[725.415, 725.445, 725.453, 777.2]
@@ -39,7 +69,7 @@ def plot_with_offset(datasets):
     N2_head_bands=[315.8, 357.7, 391, 405.9, 420.05]
     CO_head_bands=[297.7]
     # REF: The Identification of Molecular Spectra, 2nd Edition, 1976, Pearse and Gaydon
-    C2_head_bands=[516.2, 563.5]
+    C2_head_bands=[516.5, 563.5]
 
     #Dictionary of references
     reference_lines_dict = {
@@ -274,7 +304,7 @@ def plot_with_offset(datasets):
     #Temperature computation
     temperature=0
 
-#    # Add dropdown for temperature computation method
+    # Add dropdown for temperature computation method
     temp_methods = ["C2 (averaged)", "N2+ (averaged)", "OH (averaged)", "C2 (1 by 1)", "N2+ (1 by 1)", "OH (1 by 1)"]
     selected_temp_method = tk.StringVar()
     selected_temp_method.set(temp_methods[0])
@@ -390,5 +420,3 @@ def plot_with_offset(datasets):
 
     # Run the Tkinter event loop
     root.mainloop()
-
-    #Queda meter las ecuaciones de la temperatura y meter cosillas para calcular densidad electronica 
