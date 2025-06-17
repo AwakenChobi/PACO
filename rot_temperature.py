@@ -74,9 +74,15 @@ def rot_temperature_OH(x, y):
 
     energy_subpeaks = [32779, 32948, 33150, 33652, 33952, 34283]
     
-    background=0
+    background = 0
+    backgroundlist = []
 
-    tolerance = 0.03
+    maskb = (x >= 306.0) & (x <= 306.25)
+    for yi in y[maskb]:
+        backgroundlist.append(yi)
+    background = np.mean(backgroundlist)
+
+    tolerance = 0.08
     for key in [f"Q{i}" for i in range(4, 11)]:
         center = wavelength_subpeaks[key]
         mask = (x >= center - tolerance) & (x <= center + tolerance)
@@ -86,14 +92,14 @@ def rot_temperature_OH(x, y):
             print(f"Warning: No x values found for {key} in interval [{center-tolerance}, {center+tolerance}]")  # or handle missing data as you prefer
             peaks.append(np.nan)
 
-    log_i_A = [np.log(peaks[i]/crosssection_subpeaks[f"P{i+25}"]) for i in range(len(peaks))]
+    log_i_A = [np.log10(peaks[i]/crosssection_subpeaks[f"Q{i+4}"]) for i in range(len(peaks))]
 
 
     slope, intercept, r_value, p_value, std_err = linregress(energy_subpeaks, log_i_A)
 
-    #-1.09 is the factor used to convert the slope to temperature in Kelvin
+    #-0.625 is the factor used to convert the slope to temperature in Kelvin
     temperature = -0.625 / slope  
-    error = (std_err * 1.09) / (slope * slope)  # Error of the slope 
+    error = (std_err * 0.625) / (slope * slope)  # Error of the slope 
     return temperature, error, r_value, p_value, intercept
 
 
@@ -112,8 +118,16 @@ def rot_temperature_N2_plus(x, y):
 
     energy_subpeaks = [1122, 992, 870, 756, 650, 552, 462]
     
-    tolerance = 0.04
-    for key in [f"P{i}" for i in range(25, 46)]:
+    background = 0
+    backgroundlist = []
+
+    maskb = (x >= 392.0) & (x <= 392.5)
+    for yi in y[maskb]:
+        backgroundlist.append(yi)
+    background = np.mean(backgroundlist)
+
+    tolerance = 0.08
+    for key in [f"L{i}" for i in range(1, 8)]:
         center = wavelength_subpeaks[key]
         mask = (x >= center - tolerance) & (x <= center + tolerance)
         if np.any(mask):
@@ -122,11 +136,11 @@ def rot_temperature_N2_plus(x, y):
             print(f"Warning: No x values found for {key} in interval [{center-tolerance}, {center+tolerance}]")  # or handle missing data as you prefer
             peaks.append(np.nan)
 
-    log_i_A = [np.log(peaks[i]/crosssection_subpeaks[f"P{i+25}"]) for i in range(len(peaks))]
+    log_i_A = [np.log10(peaks[i]/crosssection_subpeaks[f"L{i+1}"]) for i in range(len(peaks))]
 
     slope, intercept, r_value, p_value, std_err = linregress(energy_subpeaks, log_i_A)
 
-    #-1.09 is the factor used to convert the slope to temperature in Kelvin
-    temperature = -1.296 / slope  
-    error = (std_err * 1.09) / (slope * slope)  # Error of the slope 
+    #-1.296 is the factor used to convert the slope to temperature in Kelvin
+    temperature = -1.296 / slope
+    error = (std_err * 1.296) / (slope * slope)  # Error of the slope
     return temperature, error, r_value, p_value, intercept
