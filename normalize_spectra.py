@@ -49,11 +49,12 @@ def normalize_spectra(datasets, offsets):
     #If you divide all the data points in the dataset by the same factor k (like the maximum value), the standard deviation (σ) will also be divided by k.
     # This is because the standard deviation is a measure of spread that scales linearly with linear transformations of the data.
     
-    std_dev_y = np.std(interpolated_y, axis=0) /np.max(avg_y)
+    std_dev_y = np.std(interpolated_y, axis=0)
+    normalized_std_dev_y = std_dev_y / np.max(avg_y)
 
     # Normalize the averaged spectra
     normalized_avg_y = avg_y / np.max(avg_y)
 
     print("Maximum value of avg_y before normalization:", np.max(avg_y))
     print("Maximum value of avg_y after normalization (should be 1):", np.max(normalized_avg_y))
-    return common_x, normalized_avg_y, std_dev_y
+    return common_x, avg_y, std_dev_y, normalized_avg_y, normalized_std_dev_y
