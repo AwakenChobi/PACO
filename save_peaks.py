@@ -5,7 +5,7 @@ import tkinter as tk
 import numpy as np
 #from find_peaks import find_peaks
 
-def save_normalized_peaks(common_x, normalized_avg_y, std_dev_y):
+def save_normalized_peaks(common_x, avg_y, std_dev_y, normalized_avg_y, normalized_std_dev_y):
 
     #############################################################################################################################################################################################################################################################################################################
     #https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.find_peaks.html
@@ -54,8 +54,10 @@ def save_normalized_peaks(common_x, normalized_avg_y, std_dev_y):
     peak_indices = [i for i, _ in enumerate(common_x) if i in peaks]
     data_to_save = np.column_stack((
         common_x[peak_indices],
+        avg_y[peak_indices],
+        std_dev_y[peak_indices],
         normalized_avg_y[peak_indices],
-        std_dev_y[peak_indices]
+        normalized_std_dev_y[peak_indices]
     ))
 
     # Save the data to the file
@@ -63,7 +65,7 @@ def save_normalized_peaks(common_x, normalized_avg_y, std_dev_y):
         np.savetxt(
             file_path,
             data_to_save,
-            header="X Normalized_Averaged_Y Std_Dev_Y",
+            header="X Averaged_Y Std_Dev_Y Normalized_Averaged_Y Normalized_Std_Dev_Y",
             fmt="%.9f"  # Use fixed-point notation with 9 decimal places
         ) 
         tk.messagebox.showinfo("Success", f"File saved successfully at {file_path}")

@@ -101,7 +101,7 @@ def plot_with_offset(datasets):
     }
 
     #Automatically store the normalized spectra (and substracted) for further calculations
-    [common_x, normalized_avg_y, std_dev_y]=normalize_spectra(datasets, offsets)
+    [common_x, avg_y, std_dev_y, normalized_avg_y, normalized_std_dev_y]=normalize_spectra(datasets, offsets)
 
     # Create a Matplotlib figure
     # Create a figure and axis for the plot
@@ -256,8 +256,8 @@ def plot_with_offset(datasets):
             ax.set_title("Plot with Offset Adjustment")
         else:
             # Plot normalized averaged spectrum
-            nonlocal common_x, normalized_avg_y, std_dev_y
-            [common_x, normalized_avg_y, std_dev_y]=normalize_spectra(datasets, offsets)
+            nonlocal common_x, avg_y, std_dev_y, normalized_avg_y, normalized_std_dev_y
+            [common_x, avg_y, std_dev_y, normalized_avg_y, normalized_std_dev_y] = normalize_spectra(datasets, offsets)
             ax.plot(common_x, normalized_avg_y, label="Normalized Averaged Spectrum", color="black")
             ax.set_title("Normalized Averaged Spectrum")
         ax.set_xlabel("X Axis")
@@ -309,7 +309,7 @@ def plot_with_offset(datasets):
     ttk.Button(button_frame, text="Save Normalized Spectra", command=lambda: save_normalized_spectra(datasets, offsets)).pack(side=tk.RIGHT, padx=5)
     #root = tk.Tk()
     #root.withdraw()  # Hide the main window
-    ttk.Button(button_frame, text="Save Normalized Peaks", command=lambda: save_normalized_peaks(common_x, normalized_avg_y, std_dev_y)).pack(side=tk.RIGHT, padx=5)
+    ttk.Button(button_frame, text="Save Normalized Peaks", command=lambda: save_normalized_peaks(common_x, avg_y, std_dev_y, normalized_avg_y, normalized_std_dev_y)).pack(side=tk.RIGHT, padx=5)
     ttk.Button(button_frame, text="Toggle Plot Mode", command=toggle_plot_mode).pack(side=tk.LEFT, padx=5)
     ttk.Button(button_frame, text="Compute & Plot Peaks", command=plot_peaks_on_normalized).pack(side=tk.LEFT, padx=5)
 
