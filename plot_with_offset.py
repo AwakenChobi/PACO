@@ -237,13 +237,22 @@ def plot_with_offset(datasets):
     # State variable for plot mode: 0 = datasets, 1 = normalized
     plot_mode = [0]  # Use a list for mutability in nested functions
 
+    # Add checkboxes to show/hide each dataset in multi-spectra mode
+    show_dataset_vars = [tk.BooleanVar(value=True) for _ in datasets]
+
+    # This list will hold the colors for each dataset. It would be a problem if there are more datasets than colors (10).
+    # If that happens, the colors will repeat.
+    dataset_colors = ["blue", "orange", "green", "red", "purple", "brown", "pink", "gray", "olive", "cyan"]
+
     def update_plot_mode():
         ax.clear()
         if plot_mode[0] == 0:
-            # Plot all datasets with offsets
+            # Plot all datasets with offsets, only those checked
             for i, (x, y) in enumerate(datasets):
-                adjusted_x = [xi + offsets[i] for xi in x]
-                ax.plot(adjusted_x, y, label=f"Dataset {i+1}")
+                if show_dataset_vars[i].get():
+                    adjusted_x = [xi + offsets[i] for xi in x]
+                    color = dataset_colors[i % len(dataset_colors)]
+                    ax.plot(adjusted_x, y, label=f"Dataset {i+1}", color=color)
             ax.set_title("Plot with Offset Adjustment")
         else:
             # Plot normalized averaged spectrum
@@ -256,6 +265,8 @@ def plot_with_offset(datasets):
         ax.legend()
         ax.grid(True)
         canvas.draw()
+
+    update_plot_mode()  # Initial plot
 
     peaks_artist = [None]
 
@@ -292,6 +303,7 @@ def plot_with_offset(datasets):
 
     # Add buttons for file loading and statistics computation
     button_frame = ttk.Frame(root)
+
     button_frame.pack(side=tk.BOTTOM, fill=tk.X, pady=10)
     ttk.Button(button_frame, text="Compute Stats", command=lambda: compute_stats(datasets, offsets, ax, canvas)).pack(side=tk.RIGHT, padx=5)
     ttk.Button(button_frame, text="Save Normalized Spectra", command=lambda: save_normalized_spectra(datasets, offsets)).pack(side=tk.RIGHT, padx=5)
@@ -417,6 +429,18 @@ def plot_with_offset(datasets):
     # Add a label to display the temperature
     temperature_label = tk.Label(root, text=f"Gas Temperature: {temperature}°C", font=("Arial", 12))
     temperature_label.pack(side=tk.BOTTOM, pady=10)
+
+    # Add checkboxes for each dataset
+    checkbox_frame = ttk.Frame(control_frame)
+    checkbox_frame.pack(side=tk.LEFT, padx=5)
+    for i in range(len(datasets)):
+        cb = ttk.Checkbutton(
+            checkbox_frame,
+            text=f"Show Dataset {i+1}",
+            variable=show_dataset_vars[i],
+            command=update_plot_mode
+        )
+        cb.pack(side=tk.LEFT)
 
     # Run the Tkinter event loop
     root.mainloop()
