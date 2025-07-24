@@ -4,11 +4,13 @@ from compute_stats import compute_stats
 from save_normalized_spectra import save_normalized_spectra
 from normalize_spectra import normalize_spectra
 from saturated_lines_searcher import saturated_lines_searcher
+from read_xy_file import read_xy_file
 from scipy.signal import find_peaks
 from save_peaks import save_normalized_peaks
 from rot_temperature import rot_temperature_C2, rot_temperature_OH, rot_temperature_N2_plus
 import tkinter as tk
 import tkinter.simpledialog as simpledialog
+import tkinter.filedialog as filedialog
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -168,6 +170,67 @@ def plot_with_offset(datasets):
         ax.legend()
         ax.grid(True)
         canvas.draw()
+
+    def open_new_files():
+        nonlocal datasets, offsets, show_dataset_vars, checkbox_frame, common_x, avg_y, std_dev_y, normalized_avg_y, normalized_std_dev_y
+
+        filepaths = filedialog.askopenfilenames(
+            title="Open Data Files",
+            filetypes=[("Text Files", "*.txt"), ("All Files", "*.*")]
+        )
+        if not filepaths:
+            return  # User cancelled
+
+        # Read new datasets
+        new_datasets = []
+        for fp in filepaths:
+            try:
+                x, y = read_xy_file(fp)
+                new_datasets.append((np.array(x), np.array(y)))
+            except Exception as e:
+                messagebox.showerror("File Error", f"Could not read {fp}:\n{e}")
+                return
+
+        # Adjust background for each new dataset (reuse your background subtraction logic)
+        adjusted_datasets = []
+        for idx, (x, y) in enumerate(new_datasets):
+            mask = (x >= 104) & (x <= 105)
+            background = np.mean(y[mask]) if np.any(mask) else 0
+            if background > 30:
+                msg = (f"Dataset {idx+1}: The computed background value is {background:.2f}, "
+                       "which is above 30.\nIt is possible that the background is not well computed.\n"
+                       "Would you like to input the background value manually?")
+                if messagebox.askyesno("Background Warning", msg):
+                    manual_bg = simpledialog.askfloat(
+                        "Manual Background Input",
+                        f"Enter background value for Dataset {idx+1}:",
+                        initialvalue=background
+                    )
+                    if manual_bg is not None:
+                        background = manual_bg
+            y_adjusted = y - background
+            adjusted_datasets.append((x, y_adjusted))
+
+        # Replace datasets and reset offsets and checkboxes
+        datasets = adjusted_datasets
+        offsets[:] = [0] * len(datasets)
+        show_dataset_vars[:] = [tk.BooleanVar(value=True) for _ in datasets]
+
+        # Remove old checkboxes and add new ones
+        for widget in checkbox_frame.winfo_children():
+            widget.destroy()
+        for i in range(len(datasets)):
+            cb = ttk.Checkbutton(
+                checkbox_frame,
+                text=f"Show Dataset {i+1}",
+                variable=show_dataset_vars[i],
+                command=update_plot_mode
+            )
+            cb.pack(side=tk.LEFT)
+
+        # Update normalized spectra and plot
+        [common_x, avg_y, std_dev_y, normalized_avg_y, normalized_std_dev_y] = normalize_spectra(datasets, offsets)
+        update_plot_mode()
 
     #State for toggling and storing artists
     show_ref_lines = [False]
@@ -429,6 +492,15 @@ def plot_with_offset(datasets):
     # Add a label to display the temperature
     temperature_label = tk.Label(root, text=f"Gas Temperature: {temperature}°C", font=("Arial", 12))
     temperature_label.pack(side=tk.BOTTOM, pady=10)
+
+    # Add a menu bar with an "Open" and "Exit" option
+    menubar = tk.Menu(root)
+    filemenu = tk.Menu(menubar, tearoff=0)
+    filemenu.add_command(label="Open New Files", command=open_new_files)
+    filemenu.add_separator()
+    filemenu.add_command(label="Exit", command=root.quit)
+    menubar.add_cascade(label="File", menu=filemenu)
+    root.config(menu=menubar)
 
     # Add checkboxes for each dataset
     checkbox_frame = ttk.Frame(control_frame)
