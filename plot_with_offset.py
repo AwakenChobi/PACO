@@ -16,7 +16,6 @@ import numpy as np
 
 def plot_with_offset(datasets):
     
-    # Adjust background for each dataset
     adjusted_datasets = []
     for idx, (x, y) in enumerate(datasets):
         x = np.array(x)
@@ -25,7 +24,7 @@ def plot_with_offset(datasets):
         if np.any(mask):
             background = np.mean(y[mask])
         else:
-            background = 0  # or handle as you prefer
+            background = 0  #### edit backgroud manually
 
         # If background is above 30, warn and allow manual input
         if background > 30:
@@ -45,11 +44,8 @@ def plot_with_offset(datasets):
         adjusted_datasets.append((x, y_adjusted))
     datasets = adjusted_datasets
 
-    offsets = [0]*len(datasets) # Start with an initial offset of 0 for the first dataset
+    offsets = [0]*len(datasets) # Variable to store offsets for each dataset
 
-    # Create the main window
-    # Create a Tkinter window
-    # Set the title of the window
     root = tk.Tk()
     root.title("Plot with X-Axis Offset Adjustment")
 
@@ -72,7 +68,8 @@ def plot_with_offset(datasets):
     CO_head_bands=[297.7]
     # REF: The Identification of Molecular Spectra, 2nd Edition, 1976, Pearse and Gaydon
     C2_head_bands=[516.5, 563.5]
-
+    C2_molecular_bands=[516.5, 563.5]
+    
     #Dictionary of references
     reference_lines_dict = {
         "Ar lines": Ar_lines,
@@ -298,9 +295,8 @@ def plot_with_offset(datasets):
     ttk.Button(control_frame, text="Apply Offset", command=apply_offset).pack()
 
     # State variable for plot mode: 0 = datasets, 1 = normalized
-    plot_mode = [0]  # Use a list for mutability in nested functions
+    plot_mode = [0]
 
-    # Add checkboxes to show/hide each dataset in multi-spectra mode
     show_dataset_vars = [tk.BooleanVar(value=True) for _ in datasets]
 
     # This list will hold the colors for each dataset. It would be a problem if there are more datasets than colors (10).
@@ -318,7 +314,7 @@ def plot_with_offset(datasets):
                     ax.plot(adjusted_x, y, label=f"Dataset {i+1}", color=color)
             ax.set_title("Plot with Offset Adjustment")
         else:
-            # Plot normalized averaged spectrum
+            # Plot
             nonlocal common_x, avg_y, std_dev_y, normalized_avg_y, normalized_std_dev_y
             [common_x, avg_y, std_dev_y, normalized_avg_y, normalized_std_dev_y] = normalize_spectra(datasets, offsets)
             ax.plot(common_x, normalized_avg_y, label="Normalized Averaged Spectrum", color="black")
@@ -329,12 +325,12 @@ def plot_with_offset(datasets):
         ax.grid(True)
         canvas.draw()
 
-    update_plot_mode()  # Initial plot
+    update_plot_mode()
 
     peaks_artist = [None]
 
     def plot_peaks_on_normalized():
-        # Ask the user for the minimum threshold
+        # Ask the user for the minimum threshold, useful when the ground noise is irregular
         min_height = simpledialog.askfloat(
             "Peak Threshold",
             "Enter minimum height for peaks:",
@@ -349,22 +345,20 @@ def plot_with_offset(datasets):
             peaks_artist[0].remove()
             peaks_artist[0] = None
 
-        # Compute peaks
+        # Compute peaks and plot them as x
         peaks, _ = find_peaks(normalized_avg_y, height=min_height)
-        # Plot the peaks as red 'x' markers
         peaks_artist[0] = ax.scatter(common_x[peaks], normalized_avg_y[peaks], color='red', marker='x', label='Peaks')
         ax.legend()
         canvas.draw()
 
 
     def toggle_plot_mode():
-        plot_mode[0] = 1 - plot_mode[0]  # Toggle between 0 and 1
+        plot_mode[0] = 1 - plot_mode[0]
         update_plot_mode()
 
-    # Replace calls to update_plot() with update_plot_mode()
-    update_plot_mode()  # Initial plot
+    update_plot_mode()
 
-    # Add buttons for file loading and statistics computation
+    # Buttons for file loading and statistics computation
     button_frame = ttk.Frame(root)
 
     button_frame.pack(side=tk.BOTTOM, fill=tk.X, pady=10)
@@ -480,7 +474,7 @@ def plot_with_offset(datasets):
         if show_ref_lines[0]:
             ref_name = selected_ref_lines.get()
             ref_xs = reference_lines_dict[ref_name]
-            color = reference_lines_colors.get(ref_name, "orange")  # Default to orange if not found
+            color = reference_lines_colors.get(ref_name, "orange")
             for x in ref_xs:
                 line = ax.axvline(x, color=color, linestyle=':', linewidth=1.5)
                 ref_lines_artists.append(line)
@@ -514,5 +508,4 @@ def plot_with_offset(datasets):
         )
         cb.pack(side=tk.LEFT)
 
-    # Run the Tkinter event loop
     root.mainloop()

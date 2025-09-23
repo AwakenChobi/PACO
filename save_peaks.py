@@ -40,16 +40,15 @@ def save_normalized_peaks(common_x, avg_y, std_dev_y, normalized_avg_y, normaliz
         initialvalue=0.00075,
         minvalue=0.0
     )
-    peaks, _=find_peaks(num_normalized_avg_y, height)  # Find peaks in the normalized average y data
+    peaks, _=find_peaks(num_normalized_avg_y, height)
 
-    # Ask the user where to save the file
     file_path = filedialog.asksaveasfilename(
         defaultextension=".txt",
         filetypes=[("Text Files", "*.txt")],
         title="Save Normalized-Averaged Peaks"
     )
     if not file_path:
-        return  # User canceled the save dialog
+        return
 
     peak_indices = [i for i, _ in enumerate(common_x) if i in peaks]
     data_to_save = np.column_stack((
@@ -60,13 +59,12 @@ def save_normalized_peaks(common_x, avg_y, std_dev_y, normalized_avg_y, normaliz
         normalized_std_dev_y[peak_indices]
     ))
 
-    # Save the data to the file
     try:
         np.savetxt(
             file_path,
             data_to_save,
             header="X Averaged_Y Std_Dev_Y Normalized_Averaged_Y Normalized_Std_Dev_Y",
-            fmt="%.9f"  # Use fixed-point notation with 9 decimal places
+            fmt="%.9f"
         ) 
         tk.messagebox.showinfo("Success", f"File saved successfully at {file_path}")
     except Exception as e:

@@ -1,0 +1,1 @@
+Parece que decidí meter 9 repeticiones para la condición de 24000 por alguna razón.
