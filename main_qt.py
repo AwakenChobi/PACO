@@ -53,6 +53,20 @@ def show_startup_progress():
         root.geometry("350x100")
         root.resizable(False, False)
         
+        # Add close handler for progress window
+        def on_progress_close():
+            """Handle progress window close"""
+            print("Startup cancelled by user.")
+            try:
+                root.quit()
+                root.destroy()
+            except:
+                pass
+            finally:
+                sys.exit(0)
+        
+        root.protocol("WM_DELETE_WINDOW", on_progress_close)
+        
         # Center window
         root.geometry("+{}+{}".format(
             int(root.winfo_screenwidth()/2 - 175),
@@ -103,6 +117,30 @@ def load_data_optimized(file_paths, progress_callback=None):
     
     print(f"Total data points loaded: {total_points:,}")
     return datasets
+
+def create_gui_with_close_handler(datasets):
+    """Create GUI with proper window closing integrated"""
+    try:
+        # Import the plot function
+        from plot_with_offset import plot_with_offset
+        
+        print("Creating GUI with integrated close handler...")
+        
+        # This will use the modified plot_with_offset that already has proper closing
+        plot_with_offset(datasets)
+        
+        # If we reach here, the GUI was closed normally
+        print("GUI closed normally.")
+        
+    except SystemExit:
+        print("GUI window was closed - exiting program.")
+        sys.exit(0)
+    except KeyboardInterrupt:
+        print("GUI interrupted - exiting program.")
+        sys.exit(0)
+    except Exception as e:
+        print(f"GUI error: {e}")
+        sys.exit(1)
 
 def main():
     startup_begin = time.time()
@@ -176,8 +214,8 @@ def main():
         print("Starting analysis interface...")
         gui_start = time.time()
         
-        from plot_with_offset import plot_with_offset
-        plot_with_offset(datasets)
+        # Use the integrated GUI with proper close handler
+        create_gui_with_close_handler(datasets)
         
         total_time = time.time() - startup_begin
         print(f"Total startup time: {total_time:.2f} seconds")
@@ -187,6 +225,7 @@ def main():
         print("\nInterrupted by user.")
         if progress_root:
             progress_root.destroy()
+        sys.exit(0)
     except Exception as e:
         print(f"Error: {e}")
         if progress_root:
@@ -197,6 +236,7 @@ def main():
             libs['messagebox'].showerror("Error", f"Failed to start PACO:\n{str(e)}")
         except:
             pass
+        sys.exit(1)
 
 if __name__ == "__main__":
     main()

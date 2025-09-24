@@ -48,6 +48,20 @@ def plot_with_offset(datasets):
 
     root = tk.Tk()
     root.title("Plot with X-Axis Offset Adjustment")
+    
+    # Add proper window closing handler
+    def on_closing():
+        """Handle window closing properly"""
+        try:
+            root.quit()  # Stop the mainloop
+            root.destroy()  # Destroy the window
+        except:
+            pass
+        finally:
+            import sys
+            sys.exit(0)  # Ensure the program exits
+    
+    root.protocol("WM_DELETE_WINDOW", on_closing)
 
     #Atomic lines detected in Atm press Argon plasmas in TIAGO 
     # REF: NIST atomic spectra database:
