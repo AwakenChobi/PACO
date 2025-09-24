@@ -121,8 +121,8 @@ def plot_with_offset(datasets):
     # Set the size of the figure
     #fig, ax = plt.subplots(nrows, ncols, figsize=(width, height))
     fig, ax = plt.subplots()
-    ax.set_xlabel("X Axis")
-    ax.set_ylabel("Y Axis")
+    ax.set_xlabel("wavelength (nm)")
+    ax.set_ylabel("Intensity")
     ax.set_title("Plot with Offset Adjustment")
     ax.grid(True)
 
@@ -175,8 +175,8 @@ def plot_with_offset(datasets):
         for i, (x, y) in enumerate(datasets):
             adjusted_x = [xi + offsets[i] for xi in x]
             ax.plot(adjusted_x, y, label=f"Dataset {i+1}")
-        ax.set_xlabel("X Axis")
-        ax.set_ylabel("Y Axis")
+        ax.set_xlabel("Wavelength (nm)")
+        ax.set_ylabel("Intensity")
         ax.set_title("Plot with Offset Adjustment")
         ax.legend()
         ax.grid(True)
@@ -333,8 +333,8 @@ def plot_with_offset(datasets):
             [common_x, avg_y, std_dev_y, normalized_avg_y, normalized_std_dev_y] = normalize_spectra(datasets, offsets)
             ax.plot(common_x, normalized_avg_y, label="Normalized Averaged Spectrum", color="black")
             ax.set_title("Normalized Averaged Spectrum")
-        ax.set_xlabel("X Axis")
-        ax.set_ylabel("Y Axis")
+        ax.set_xlabel("Wavelength (nm)")
+        ax.set_ylabel("Intensity")
         ax.legend()
         ax.grid(True)
         canvas.draw()
