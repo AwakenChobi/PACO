@@ -44,22 +44,21 @@ def plot_with_offset(datasets):
         adjusted_datasets.append((x, y_adjusted))
     datasets = adjusted_datasets
 
-    offsets = [0]*len(datasets) # Variable to store offsets for each dataset
+    offsets = [0]*len(datasets)
 
     root = tk.Tk()
     root.title("Plot with X-Axis Offset Adjustment")
     
-    # Add proper window closing handler
     def on_closing():
         """Handle window closing properly"""
         try:
-            root.quit()  # Stop the mainloop
-            root.destroy()  # Destroy the window
+            root.quit()
+            root.destroy()
         except:
             pass
         finally:
             import sys
-            sys.exit(0)  # Ensure the program exits
+            sys.exit(0)
     
     root.protocol("WM_DELETE_WINDOW", on_closing)
 
@@ -113,7 +112,6 @@ def plot_with_offset(datasets):
         "C2 head bands": "olive",
     }
 
-    #Automatically store the normalized spectra (and substracted) for further calculations
     [common_x, avg_y, std_dev_y, normalized_avg_y, normalized_std_dev_y]=normalize_spectra(datasets, offsets)
 
     # Create a Matplotlib figure
@@ -139,7 +137,6 @@ def plot_with_offset(datasets):
     toolbar.update()
     toolbar.pack(side=tk.TOP, fill=tk.X)
 
-    # Function to update the plot with offsets
     def update_plot():
         ax.clear()
         for i, (x, y) in enumerate(datasets):
@@ -151,12 +148,10 @@ def plot_with_offset(datasets):
 
     def toggle_saturated_lines():
         show_saturated_lines[0] = not show_saturated_lines[0]
-        # Remove old lines
         for artist in saturated_lines_artists:
             artist.remove()
         saturated_lines_artists.clear()
         if show_saturated_lines[0]:
-            # Get all saturated x positions from all datasets
             for i, (x, y) in enumerate(datasets):
                 saturated_x = saturated_lines_searcher(x+offsets[i], y)
                 for sx in saturated_x:
@@ -192,7 +187,6 @@ def plot_with_offset(datasets):
         if not filepaths:
             return  # User cancelled
 
-        # Read new datasets
         new_datasets = []
         for fp in filepaths:
             try:
@@ -202,7 +196,6 @@ def plot_with_offset(datasets):
                 messagebox.showerror("File Error", f"Could not read {fp}:\n{e}")
                 return
 
-        # Adjust background for each new dataset (reuse your background subtraction logic)
         adjusted_datasets = []
         for idx, (x, y) in enumerate(new_datasets):
             mask = (x >= 104) & (x <= 105)
@@ -222,7 +215,6 @@ def plot_with_offset(datasets):
             y_adjusted = y - background
             adjusted_datasets.append((x, y_adjusted))
 
-        # Replace datasets and reset offsets and checkboxes
         datasets = adjusted_datasets
         offsets[:] = [0] * len(datasets)
         show_dataset_vars[:] = [tk.BooleanVar(value=True) for _ in datasets]
@@ -239,30 +231,29 @@ def plot_with_offset(datasets):
             )
             cb.pack(side=tk.LEFT)
 
-        # Update normalized spectra and plot
         [common_x, avg_y, std_dev_y, normalized_avg_y, normalized_std_dev_y] = normalize_spectra(datasets, offsets)
         update_plot_mode()
 
-    #State for toggling and storing artists
+    # State for toggling and storing artists
     show_ref_lines = [False]
     ref_lines_artists = []
 
     show_saturated_lines = [False]
     saturated_lines_artists = []
 
-    # Add controls for each dataset for offset adjustment
+    # Controls for each dataset for offset adjustment
     control_frame = ttk.Frame(root)
     control_frame.pack(side=tk.BOTTOM, fill=tk.X, pady=10)
 
-    #Add dropdown for reference lines selection
+    # Dropdown for reference lines selection
     selected_ref_lines = tk.StringVar()
     selected_ref_lines.set("Ar lines")  # Default selection
     ref_dropdown = ttk.OptionMenu(control_frame, selected_ref_lines,"Ar lines", *reference_lines_dict.keys())
     ref_dropdown.pack(side=tk.LEFT, padx=5)
 
 
-    # Dropdown menu to select the dataset
-    # Dropdown menu to select the dataset
+    # Menu to select the dataset
+    # Menu to select the dataset
     selected_dataset = tk.StringVar()
     if datasets:
         selected_dataset.set("Dataset 1")  # Default to the first dataset
@@ -280,7 +271,7 @@ def plot_with_offset(datasets):
     )
     dataset_dropdown.pack(side=tk.LEFT, padx=5)
 
-    # Entry for manual offset adjustment
+    # Manual offset adjustment
     offset_entry = ttk.Entry(control_frame, width=10)
     offset_entry.pack(side=tk.LEFT, padx=5)
     offset_entry.insert(0, "0.0")  # Default value
@@ -288,19 +279,16 @@ def plot_with_offset(datasets):
     # Button to apply the offset from the entry
     def apply_offset():
         try:
-            # Validate the selected dataset
             selected_value = selected_dataset.get()
             if not selected_value.startswith("Dataset"):
                 raise ValueError("Invalid dataset selected.")
 
-            # Extract the dataset index from the dropdown menu
-            dataset_index = int(selected_value.split()[-1]) - 1  # Extract dataset index from dropdown
+            dataset_index = int(selected_value.split()[-1]) - 1
             if dataset_index < 0 or dataset_index >= len(datasets):
                 raise IndexError("Dataset index out of range.")
 
-            # Validate the offset input
-            offset = float(offset_entry.get())  # Get the offset value from the entry
-            update_offset(dataset_index, offset)  # Update the offset for the selected dataset
+            offset = float(offset_entry.get())
+            update_offset(dataset_index, offset)
         except ValueError:
             tk.messagebox.showerror("Error", "Please select a valid dataset and enter a valid number.")
         except IndexError:
@@ -344,7 +332,7 @@ def plot_with_offset(datasets):
     peaks_artist = [None]
 
     def plot_peaks_on_normalized():
-        # Ask the user for the minimum threshold, useful when the ground noise is irregular
+        # Minimum intensity to consider a peak
         min_height = simpledialog.askfloat(
             "Peak Threshold",
             "Enter minimum height for peaks:",
@@ -387,7 +375,7 @@ def plot_with_offset(datasets):
     #Temperature computation
     temperature=0
 
-    # Add dropdown for temperature computation method
+    # Dropdown for temperature computation method
     temp_methods = ["C2 (averaged)", "N2+ (averaged)", "OH (averaged)", "C2 (1 by 1)", "N2+ (1 by 1)", "OH (1 by 1)"]
     selected_temp_method = tk.StringVar()
     selected_temp_method.set(temp_methods[0])
@@ -457,7 +445,6 @@ def plot_with_offset(datasets):
 
     ttk.Button(button_frame, text="Toggle Saturated Lines", command=toggle_saturated_lines).pack(side=tk.RIGHT, padx=5)
 
-    # Function automatically update the reference lines when the dropdown changes
     def on_ref_dropdown_change(*args):
         if show_ref_lines[0]:
             # Remove old lines
@@ -494,14 +481,14 @@ def plot_with_offset(datasets):
                 ref_lines_artists.append(line)
         canvas.draw()
 
-    # Add the toggle button for reference lines/bands
+    # Button for reference lines/bands
     ttk.Button(control_frame, text="Toggle Reference Lines", command=toggle_reference_lines).pack(side=tk.LEFT, padx=5)
 
-    # Add a label to display the temperature
+    # Label to display the temperature
     temperature_label = tk.Label(root, text=f"Gas Temperature: {temperature}°C", font=("Arial", 12))
     temperature_label.pack(side=tk.BOTTOM, pady=10)
 
-    # Add a menu bar with an "Open" and "Exit" option
+    # Menu bar with an "Open" and "Exit" option
     menubar = tk.Menu(root)
     filemenu = tk.Menu(menubar, tearoff=0)
     filemenu.add_command(label="Open New Files", command=open_new_files)
@@ -510,7 +497,7 @@ def plot_with_offset(datasets):
     menubar.add_cascade(label="File", menu=filemenu)
     root.config(menu=menubar)
 
-    # Add checkboxes for each dataset
+    # Checkboxes for each dataset
     checkbox_frame = ttk.Frame(control_frame)
     checkbox_frame.pack(side=tk.LEFT, padx=5)
     for i in range(len(datasets)):
