@@ -1,7 +1,0 @@
-os_2400(nm)=	-0.98
-os_1200(nm)=	-1.27
-T_2400(K)=	3946.6
-T_err_2400(K)=	211.6
-T_1200(K)=	3806.2
-T_err_1200(K)=	293.1
-obs=		Parece que decidí meter 9 repeticiones para la condición de 24000 por alguna razón. os_1200 fue calibrado con la cabeza de banda de C2
