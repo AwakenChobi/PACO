@@ -1,0 +1,1 @@
+Los datos de las primeras 4 vueltas no son representativos para este experimento

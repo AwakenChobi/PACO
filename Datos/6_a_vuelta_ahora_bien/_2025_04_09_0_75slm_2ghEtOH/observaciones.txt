@@ -1,0 +1,11 @@
+os_2400(nm)=	-0.97
+os_1200(nm)=	-1.294
+T_2400m(K)=	4626.6
+T_err_2400m(K)=	1463.2
+T_1200m(K)=	NaN
+T_err_1200m(K)=	NaN
+T_24001(K)1=	4055.4
+T_err_24001(K)=	205.7
+T_12001(K)=	NaN
+T_err_12001(K)=	NaN
+obs=		Parece que decidí meter 9 repeticiones para la condición de 24000 por alguna razón. os_1200 fue calibrado con la cabeza de banda de C2. T_loquesea1 es la temperatura calculada 1 a 1 y promediada y mean es la temperatura de la media de los espectros.
