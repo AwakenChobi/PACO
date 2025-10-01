@@ -1,0 +1,11 @@
+os_2400(nm)=	-0.
+os_1200(nm)=	-1.383
+T_2400m(K)=	NaN
+T_err_2400m(K)=	NaN
+T_1200m(K)=	NaN
+T_err_1200m(K)=	NaN
+T_24001(K)1=	NaN
+T_err_24001(K)=	NaN
+T_12001(K)=	NaN
+T_err_12001(K)=	NaN
+obs=		os_1200 fue calibrado con las líneas atómicas del argón. Parece que alrededor de la 696.5 el desfase es de -1.383 pero si se calibra con la h alpha, el desfase sería de unos -1.233 nm. parece que incluso en rangos más bajos el offset varía más.

@@ -1,0 +1,11 @@
+os_2400(nm)=	-0.9707
+os_1200(nm)=	-1.291
+T_2400m(K)=	4612.9
+T_err_2400m(K)=	1424.5
+T_1200m(K)=	NaN
+T_err_1200m(K)=	NaN
+T_24001(K)1=	4126.4
+T_err_24001(K)=	208.9
+T_12001(K)=	NaN
+T_err_12001(K)=	NaN
+obs=		os_1200 fue calibrado con la cabeza de banda de C2. T_loquesea1 es la temperatura calculada 1 a 1 y promediada y mean es la temperatura de la media de los espectros. Aunque está calibrado en 516.5, alrededor de 563.5 vuelve a tener un offset de 0.1.
