@@ -332,6 +332,42 @@ def plot_with_offset(datasets, initial_offsets=None):
         ax.grid(True)
         canvas.draw()
 
+    def get_current_plot_points():
+        if plot_mode[0] == 0:
+            points = []
+            for i, (x, y) in enumerate(datasets):
+                if show_dataset_vars[i].get():
+                    adjusted_x = np.asarray(x) + offsets[i]
+                    points.append((adjusted_x, np.asarray(y)))
+            return points
+
+        return [(np.asarray(common_x), np.asarray(normalized_avg_y))]
+
+    def copy_nearest_y_value(event):
+        if event.inaxes != ax or event.xdata is None or event.ydata is None:
+            return
+
+        nearest_y = None
+        min_distance = np.inf
+
+        for x_vals, y_vals in get_current_plot_points():
+            if len(x_vals) == 0 or len(y_vals) == 0:
+                continue
+            distances = (x_vals - event.xdata) ** 2 + (y_vals - event.ydata) ** 2
+            idx = int(np.argmin(distances))
+            if distances[idx] < min_distance:
+                min_distance = distances[idx]
+                nearest_y = float(y_vals[idx])
+
+        if nearest_y is None:
+            return
+
+        root.clipboard_clear()
+        root.clipboard_append(f"{nearest_y}")
+        root.update()
+
+    canvas.mpl_connect("button_press_event", copy_nearest_y_value)
+
     update_plot_mode()
 
     peaks_artist = [None]

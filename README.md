@@ -101,7 +101,7 @@ The main scripts and their purposes are:
 - `main.py`: Entry point for batch processing and orchestration.
 - `read_xy_file.py`: Reads spectral data from XY files (being X the frecuency/waveleght and Y the intensity).
 - `normalize_spectra.py`: Normalizes spectra for comparison.
-- `plot_with_offset.py`: Plots multiple datasets (ideally of the same experimental condition) and applies the inputed offset. Some reference wavelenghts are included in the code, but the user can easily add more if they are needed. This function also plots the averaged-normalized spectra. It also have the functionality to detect and mark peaks in the former plot given a minimum intensity for a peak to be considered as one.
+- `plot_with_offset.py`: Plots multiple datasets (ideally of the same experimental condition) and applies the inputed offset. Some reference wavelenghts are included in the code, but the user can easily add more if they are needed. This function also plots the averaged-normalized spectra. It also have the functionality to detect and mark peaks in the former plot given a minimum intensity for a peak to be considered as one. Clicking on the graph copies to the clipboard the `y` value of the nearest plotted point.
 - `saturated_lines_searcher.py`: Detects saturated lines in spectra. The saturation limit can be easily modified inside the code.
 - `save_normalized_spectra.py`: Saves normalized spectra in a .txt file.
 - `save_peaks.py`: Saves detected peaks to a .txt file. The minimum intensity is first asked.
