@@ -14,7 +14,7 @@ import tkinter.filedialog as filedialog
 import matplotlib.pyplot as plt
 import numpy as np
 
-def plot_with_offset(datasets):
+def plot_with_offset(datasets, initial_offsets=None):
     
     adjusted_datasets = []
     for idx, (x, y) in enumerate(datasets):
@@ -44,7 +44,10 @@ def plot_with_offset(datasets):
         adjusted_datasets.append((x, y_adjusted))
     datasets = adjusted_datasets
 
-    offsets = [0]*len(datasets)
+    if initial_offsets is not None and len(initial_offsets) == len(datasets):
+        offsets = [float(v) for v in initial_offsets]
+    else:
+        offsets = [0] * len(datasets)
 
     root = tk.Tk()
     root.title("Plot with X-Axis Offset Adjustment")
@@ -188,10 +191,12 @@ def plot_with_offset(datasets):
             return  # User cancelled
 
         new_datasets = []
+        new_offsets = []
         for fp in filepaths:
             try:
-                x, y = read_xy_file(fp)
+                x, y, x_offset = read_xy_file(fp, return_offset=True)
                 new_datasets.append((np.array(x), np.array(y)))
+                new_offsets.append(float(x_offset))
             except Exception as e:
                 messagebox.showerror("File Error", f"Could not read {fp}:\n{e}")
                 return
@@ -216,7 +221,7 @@ def plot_with_offset(datasets):
             adjusted_datasets.append((x, y_adjusted))
 
         datasets = adjusted_datasets
-        offsets[:] = [0] * len(datasets)
+        offsets[:] = new_offsets
         show_dataset_vars[:] = [tk.BooleanVar(value=True) for _ in datasets]
 
         # Remove old checkboxes and add new ones

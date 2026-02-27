@@ -2,6 +2,7 @@ import time
 import sys
 import os
 import numpy as np
+from read_xy_file import read_xy_file
 
 print("PACO Data Analyzer")
 print("=" * 50)
@@ -86,6 +87,7 @@ def show_startup_progress():
 def load_data_optimized(file_paths, progress_callback=None):
     """Optimized data loading with progress feedback"""
     datasets = []
+    x_offsets = []
     total_points = 0
     
     for i, file_path in enumerate(file_paths):
@@ -94,26 +96,32 @@ def load_data_optimized(file_paths, progress_callback=None):
         
         try:
             start = time.time()
-            data = np.loadtxt(file_path, dtype=np.float64) 
-            x, y = data[:, 0], data[:, 1]
+            x, y, x_offset = read_xy_file(file_path, return_offset=True)
+            x = np.array(x, dtype=np.float64)
+            y = np.array(y, dtype=np.float64)
+
+            if x.size == 0 or y.size == 0:
+                raise Exception("No valid XY numeric data found in file")
+
             datasets.append((x, y))
+            x_offsets.append(x_offset)
             
             load_time = time.time() - start
             points = len(x)
             total_points += points
             
-            print(f"  Loaded {os.path.basename(file_path)}: {points:,} points ({load_time:.2f}s)")
+            print(f"  Loaded {os.path.basename(file_path)}: {points:,} points ({load_time:.2f}s), x_offset={x_offset:.6g}")
             
         except Exception as e:
             raise Exception(f"Failed to load {os.path.basename(file_path)}: {str(e)}")
     
     print(f"Total data points loaded: {total_points:,}")
-    return datasets
+    return datasets, x_offsets
 
-def create_gui_with_close_handler(datasets):
+def create_gui_with_close_handler(datasets, x_offsets):
     try:
         from plot_with_offset import plot_with_offset
-        plot_with_offset(datasets) 
+        plot_with_offset(datasets, initial_offsets=x_offsets) 
         print("GUI closed.")
         
     except SystemExit:
@@ -178,7 +186,7 @@ def main():
             update_status(msg)
         
         load_start = time.time()
-        datasets = load_data_optimized(file_paths, progress_callback)
+        datasets, x_offsets = load_data_optimized(file_paths, progress_callback)
         load_time = time.time() - load_start
         
         print(f"Data loading completed in {load_time:.2f} seconds")
@@ -189,7 +197,7 @@ def main():
         print("Starting analysis interface...")
         gui_start = time.time()
         
-        create_gui_with_close_handler(datasets)
+        create_gui_with_close_handler(datasets, x_offsets)
         
         total_time = time.time() - startup_begin
         print(f"Total startup time: {total_time:.2f} seconds")

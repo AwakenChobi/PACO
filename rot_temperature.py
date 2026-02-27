@@ -26,7 +26,7 @@ def rot_temperature_C2(x, y):
     background = 0
     backgroundlist = []
 
-    maskb = (x >= 517.8) & (x <= 518.0)
+    maskb = (x >= 516.7) & (x <= 517.0)
     for yi in y[maskb]:
         backgroundlist.append(yi)
     

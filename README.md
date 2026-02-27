@@ -106,11 +106,21 @@ The main scripts and their purposes are:
 - `save_normalized_spectra.py`: Saves normalized spectra in a .txt file.
 - `save_peaks.py`: Saves detected peaks to a .txt file. The minimum intensity is first asked.
 - `compute_stats.py`: Computes statistics on spectral data.
+- `rot_temperature.py`: Computes rotational gas temperature from spectral molecular bands (C2, N2+, and OH), either from averaged spectra or dataset-by-dataset. It its important that the spectra has a clean baseline in the interval
 
 Example usage:
 ```sh
 python main.py
 ```
+
+Optional offset metadata in `.txt` files:
+
+- Add a comment line anywhere in the file (top or bottom recommended):
+  `# PACO_X_OFFSET = 0.35`
+- Accepted variants are also:
+  `# X_OFFSET = 0.35` or `# X_OFFSET: 0.35`
+- The value is applied automatically to the X-axis offset for that dataset.
+- If no offset line is present, offset defaults to `0.0`.
 
 ## Functions
 
@@ -136,6 +146,12 @@ Below is a summary of the main functions defined in the codebase:
 
 ### `compute_stats.py`
 - `compute_statistics(intensities)`: Computes statistics (mean, std, etc.) for intensity data.
+
+### `rot_temperature.py`
+It is important that the spectra has a clean baseline on the interval between 517.8 and 518.0 nm. Is it is not the case, please consider to rewrite this line of code to fit your spectra adding a baseline that fits your case.
+- `rot_temperature_C2(wavelengths, intensities)`: Estimates rotational temperature using C2 molecular features.
+- `rot_temperature_N2_plus(wavelengths, intensities)`: Estimates rotational temperature using N2+ molecular features.
+- `rot_temperature_OH(wavelengths, intensities)`: Estimates rotational temperature using OH molecular features.
 
 ## Roadmap
 
