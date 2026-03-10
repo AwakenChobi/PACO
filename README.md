@@ -139,7 +139,7 @@ Below is a summary of the main functions defined in the codebase:
 - `find_saturated_lines(wavelengths, intensities, threshold)`: Identifies saturated lines above a given intensity threshold.
 
 ### `save_normalized_spectra.py`
-- `save_normalized_spectra(filepath, wavelengths, normalized_intensities)`: Saves normalized spectra to a file.
+- `save_normalized_spectra(datasets, offsets)`: Saves normalized-averaged spectra to a `.txt` file with seven columns: `X`, `Averaged_Y`, `Std_Dev_Y`, `Std_Err_Y`, `Normalized_Averaged_Y`, `Normalized_Std_Dev_Y`, and `Normalized_Std_Err_Y`.
 
 ### `save_peaks.py`
 - `save_peaks(filepath, peaks)`: Saves detected peaks to a file.
@@ -149,15 +149,13 @@ Below is a summary of the main functions defined in the codebase:
 
 ### `rot_temperature.py`
 It is important that the spectra has a clean baseline on the interval between 517.8 and 518.0 nm. Is it is not the case, please consider to rewrite this line of code to fit your spectra adding a baseline that fits your case.
-- `rot_temperature_C2(wavelengths, intensities)`: Estimates rotational temperature using C2 molecular features.
-- `rot_temperature_N2_plus(wavelengths, intensities)`: Estimates rotational temperature using N2+ molecular features.
-- `rot_temperature_OH(wavelengths, intensities)`: Estimates rotational temperature using OH molecular features.
+- `rot_temperature_C2(wavelengths, intensities)`: Estimates rotational temperature using C2 molecular bands.
+- `rot_temperature_N2_plus(wavelengths, intensities)`: Estimates rotational temperature using N2+ molecular bands.
+- `rot_temperature_OH(wavelengths, intensities)`: Estimates rotational temperature using OH molecular bands.
 
 ## Roadmap
 
-- [ ] Add GUI for easier interaction
-- [ ] Support more file formats
-- [ ] Advanced peak detection algorithms
+- [ ] Advanced peak analysis.
 
 See the [open issues](https://github.com/github_username/repo_name/issues) for a full list of proposed features (and known issues).
 
@@ -183,7 +181,7 @@ Distributed under the project_license. See `LICENSE.txt` for more information.
 
 ## Contact
 
-Antonio Cobos Luque - [@twitter_handle](https://www.researchgate.net/profile/A-Cobos-Luque) - email@email_client.com
+Antonio Cobos Luque - [@twitter_handle](https://www.researchgate.net/profile/A-Cobos-Luque) - acobos@uco.es
 
 Project Link: [https://github.com/github_username/repo_name](https://github.com/github_username/repo_name)
 

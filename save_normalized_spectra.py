@@ -32,6 +32,11 @@ def save_normalized_spectra(datasets, offsets):
     std_dev_y = np.std(interpolated_y, axis=0)
     normalized_std_dev_y = std_dev_y / np.max(avg_y)
 
+    # Compute the standard error for each x value
+    n = len(interpolated_y)
+    std_err_y = std_dev_y / np.sqrt(n)
+    normalized_std_err_y = normalized_std_dev_y / np.sqrt(n)
+
     # Normalize the averaged spectra
     normalized_avg_y = avg_y / np.max(avg_y)
 
@@ -53,8 +58,8 @@ def save_normalized_spectra(datasets, offsets):
     try:
         np.savetxt(
             file_path,
-            np.column_stack((common_x, avg_y, std_dev_y, normalized_avg_y, normalized_std_dev_y)),
-            header="X Averaged_Y Std_Dev_Y Normalized_Averaged_Y Normalized_Std_Dev_Y",
+            np.column_stack((common_x, avg_y, std_dev_y, std_err_y, normalized_avg_y, normalized_std_dev_y, normalized_std_err_y)),
+            header="X Averaged_Y Std_Dev_Y Std_Err_Y Normalized_Averaged_Y Normalized_Std_Dev_Y Normalized_Std_Err_Y",
             fmt="%.9f"  # Use fixed-point notation with 9 decimal places
         ) 
         tk.messagebox.showinfo("Success", f"File saved successfully at {file_path}")
