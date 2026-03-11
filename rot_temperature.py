@@ -94,7 +94,6 @@ def rot_temperature_OH(x, y):
 
     log_i_A = [np.log10(peaks[i]/crosssection_subpeaks[f"Q{i+4}"]) for i in range(len(peaks))]
 
-
     slope, intercept, r_value, p_value, std_err = linregress(energy_subpeaks, log_i_A)
 
     #-0.625 is the factor used to convert the slope to temperature in Kelvin
