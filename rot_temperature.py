@@ -23,14 +23,9 @@ def rot_temperature_C2(x, y):
 
     energy_subpeaks = [(i**2)-i for i in range(25, 46)]
     
-    background = 0
-    backgroundlist = []
-
     maskb = (x >= 516.7) & (x <= 517.0)
-    for yi in y[maskb]:
-        backgroundlist.append(yi)
-    
-    background = np.mean(backgroundlist)
+    background_values = y[maskb]
+    background = np.mean(background_values) if len(background_values) > 0 else 0
         
     print(f"Background value: {background}")
 
