@@ -34,7 +34,7 @@ def rot_temperature_C2(x, y):
         
     print(f"Background value: {background}")
 
-    tolerance = 0.055
+    tolerance = 0.03
     for key in [f"P{i}" for i in range(25, 46)]:
         center = wavelength_subpeaks[key]
         mask = (x >= center - tolerance) & (x <= center + tolerance)
