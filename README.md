@@ -1,3 +1,5 @@
+FIX CURSOR STRANGE OFFSET IN Y 
+
 # PACO
 Programa de Análisis de Cualidades Ópticas
 
